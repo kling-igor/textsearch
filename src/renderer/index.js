@@ -3,10 +3,10 @@ import { render } from "react-dom";
 import App from "./app";
 import { Provider } from "mobx-react";
 
-import rootStore from "./rootstore";
+import store from "./store";
 
 render(
-  <Provider store={rootStore}>
+  <Provider store={store}>
     <App />
   </Provider>,
   document.getElementById("app")

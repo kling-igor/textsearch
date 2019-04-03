@@ -1,7 +1,7 @@
 {
-  "name": "electron-boilerplate",
+  "name": "textsearch",
   "version": "1.0.0",
-  "description": "Electron@5, React@16, MobX@5, Babel@7 boilerplate",
+  "description": "PoC fuzzy text search in project files",
   "main": "app/main.js",
   "scripts": {
     "start": "electron .",

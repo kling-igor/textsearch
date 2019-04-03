@@ -43,6 +43,11 @@ class WindowManager {
       icon:
         process.platform === "linux" &&
         join(__dirname, "assets", "icons", "png", "64x64.png"),
+      webPreferences: {
+        disableBlinkFeatures: 'Auxclick',
+        nodeIntegration: true
+        // и другие опции
+      },
       ...options
     });
 

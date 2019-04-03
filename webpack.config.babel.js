@@ -11,8 +11,11 @@ module.exports = env => ({
 
   watch: false,
 
+  target: 'electron-renderer',
+
   node: {
-    fs: "empty"
+    fs: 'empty',
+    __dirname: false
   },
 
   watchOptions: {

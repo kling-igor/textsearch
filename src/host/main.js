@@ -1,6 +1,8 @@
 import "@babel/polyfill";
-import { app } from "electron";
+import { app, ipcMain, BrowserWindow } from "electron";
 import WM from "./window-manager";
+
+const { callRenderer, answerRenderer } = require('./ipc')(ipcMain, BrowserWindow)
 
 const onFocus = hash => {
   const win = WM.getWindow(hash);
@@ -36,3 +38,27 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+
+ipcMain.on('search', (projectPath, query, options) => {
+  console.log('SEARCH!!!')
+})
+
+/*
+return await new Promise((resolve, reject) => {
+  worker = fork(join(__dirname, 'worker.js'), [projectPath]);
+
+  worker.once('message', ({ status, details }) => {
+
+    setImmediate(() => {
+      worker.kill('SIGKILL')
+    })
+
+    if (status === 'error') {
+      reject(details)
+    }
+    else {
+      resolve()
+    }
+  });
+})
+*/
