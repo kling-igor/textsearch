@@ -1,4 +1,6 @@
 import "@babel/polyfill";
+import { fork } from 'child_process'
+import { join } from "path";
 import { app, ipcMain, BrowserWindow } from "electron";
 import WM from "./window-manager";
 
@@ -39,8 +41,26 @@ app.on("window-all-closed", () => {
   }
 });
 
-ipcMain.on('search', (projectPath, query, options) => {
-  console.log('SEARCH!!!')
+let worker
+let currentCorrelationMarker
+
+ipcMain.on('search', (event, correlationMarker, projectPath, query, searchOptions) => {
+  console.log(`SEARCH ${query} in ${projectPath}`)
+
+  // убиваем воркер, работающий над старой задачей
+  if (worker && currentCorrelationMarker && currentCorrelationMarker !== correlationMarker) {
+    worker.kill('SIGKILL')
+    worker = null
+  }
+
+  if (!worker) {
+    worker = fork(join(__dirname, 'worker.js'), [projectPath]);
+    currentCorrelationMarker = correlationMarker
+
+    worker.on('message', details => {
+      console.log('RECEIVED FROM WORKER:', details)
+    })
+  }
 })
 
 /*

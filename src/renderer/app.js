@@ -2,7 +2,7 @@ const { ipcRenderer, remote } = window.require('electron')
 const { callMain, answerMain } = require('./ipc').default(ipcRenderer)
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-
+import uuidv4 from 'uuid/v4'
 @inject(({ store }) => ({ store }))
 @observer
 export default class App extends Component {
@@ -34,10 +34,11 @@ export default class App extends Component {
   }
 
   search = () => {
-    const { query, projectPath } = this.props.store
+    const { projectPath, query, searchOptions = {} } = this.props.store
 
     console.log(`searching '${query}' in ${projectPath} ...`)
-    // ipcRenderer('search', projectPath, query, {})
+    const correlationMarker = uuidv4()
+    ipcRenderer.send('search', correlationMarker, projectPath, query, searchOptions)
   }
 
   render() {
