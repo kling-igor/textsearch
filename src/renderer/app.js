@@ -59,7 +59,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { store: { projectPath, query } } = this.props;
+    const { store: { projectPath, query, searchResult } } = this.props;
 
     if (!projectPath) {
       return (
@@ -71,6 +71,30 @@ export default class App extends Component {
       <>
         <input type="text" value={query} onChange={this.handleQueryChange} />
         <button onClick={() => this.search()}>Search</button>
+        <ul>
+          {searchResult.map(({ text, line, file, path, matches }) => {
+
+            return (
+              <li key={`${path}/${file}`}>
+                <span>{file}</span>{"\u00a0"}<span>{path}</span>{"\u00a0"}<span style={{ backgroundColor: 'lightgreen', borderRadius: '50%', paddingLeft: '5px', paddingRight: '5px' }}>{matches.length}</span>
+                <ul>
+                  {matches.map(([first, last]) => {
+                    const beforeMatch = text.slice(0, first)
+                    const matched = text.slice(first, last + 1)
+                    const afterMatch = text.slice(last + 1)
+                    return (
+                      <li key={`${path}/${file}:${line}:${first}`} onClick={() => { console.log(`${path}/${file}:${line}:${first}`) }}>
+                        <span>{beforeMatch}</span>
+                        <span style={{ backgroundColor: 'yellow' }}>{matched}</span>
+                        <span>{afterMatch}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </li>
+            )
+          })}
+        </ul>
       </>
     )
 

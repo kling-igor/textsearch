@@ -29,6 +29,29 @@ class Store {
   setQuery(query) {
     this.query = query
   }
+
+  @observable searchResult = [
+    {
+      text: '  hello hello',
+      line: 3,
+      file: 'hello.js',
+      path: 'controllers',
+      matches: [
+        [3, 5],
+        [9, 11]
+      ]
+    },
+    {
+      text: 'id:"hello"',
+      line: 5,
+      file: 'hello.json',
+      path: 'views',
+      matches: [
+        [5, 7]
+      ]
+    },
+  ]
+
 }
 
 export default new Store();
