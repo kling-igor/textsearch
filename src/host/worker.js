@@ -67,13 +67,9 @@ const __searchOptions = {
 }
 
 const searchInFile = (filePath, query, searchOptions) => {
-
-  console.log('searching in:', filePath)
-
   return new Promise((resolve, reject) => {
     let searchResult = [];
 
-    console.log('createReadStream:', filePath)
     const stream = createReadStream(filePath, fileOptions);
 
     stream.on("data", data => {
@@ -84,20 +80,12 @@ const searchInFile = (filePath, query, searchOptions) => {
       const fuse = new Fuse(lines, __searchOptions);
       const results = fuse.search(query);
       searchResult = [...searchResult, ...results];
-      console.log('searchResult:', searchResult)
     });
     stream.on("close", () => {
       resolve(searchResult);
     });
   })
 }
-
-// searchTextPromise
-//   .then(result => {
-//     result.forEach(item => {
-//       console.log(JSON.stringify(item));
-//     });
-//   });
 
 const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
   const folderItems = await readdir(folderPath)
@@ -120,4 +108,8 @@ const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
   }
 }
 
-search(projectPath, query, searchOptions)
+search(projectPath, query, searchOptions).then(() => {
+  process.exit(0);
+})
+
+
