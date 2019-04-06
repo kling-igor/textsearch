@@ -15,6 +15,23 @@ export default class App extends Component {
       console.log('search-result:', result)
     })
 
+
+    ipcRenderer.on('search', (event, details) => {
+      const { status, result } = details
+      if (status === 'ready') {
+        console.log('SEARCH READY')
+      }
+
+      if (Array.isArray(result) && result.length > 0) {
+        for (const { item, matches } of result) {
+          console.log(`${item.line}: ${item.text}`)
+          for (const match of matches) {
+            console.log('columns:', match.indices)
+          }
+        }
+      }
+    })
+
   }
 
   openFile = () => {

@@ -54,31 +54,11 @@ ipcMain.on('search', (event, correlationMarker, projectPath, query, searchOption
   }
 
   if (!worker) {
-    worker = fork(join(__dirname, 'worker.js'), [projectPath]);
+    worker = fork(join(__dirname, 'worker.js'), [projectPath, query, JSON.stringify(searchOptions)]);
     currentCorrelationMarker = correlationMarker
 
     worker.on('message', details => {
-      console.log('RECEIVED FROM WORKER:', details)
+      event.sender.send('search', details)
     })
   }
 })
-
-/*
-return await new Promise((resolve, reject) => {
-  worker = fork(join(__dirname, 'worker.js'), [projectPath]);
-
-  worker.once('message', ({ status, details }) => {
-
-    setImmediate(() => {
-      worker.kill('SIGKILL')
-    })
-
-    if (status === 'error') {
-      reject(details)
-    }
-    else {
-      resolve()
-    }
-  });
-})
-*/

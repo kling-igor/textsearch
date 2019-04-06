@@ -14,6 +14,8 @@ import Fuse from "fuse.js";
 const fileOptions = { encoding: 'utf-8' }
 
 const projectPath = process.argv[2]
+const query = process.argv[3]
+const searchOptions = JSON.parse(process.argv[4] || null)
 
 // setInterval(() => {
 //   process.send({ details: 'I`m alive!!!' });
@@ -26,19 +28,7 @@ const projectPath = process.argv[2]
 
 // const file = resolve(__dirname, "sometext.txt");
 
-const searchOptions = {
-  caseSensitive: true,
-  shouldSort: true,
-  findAllMatches: true,
-  includeScore: true,
-  includeMatches: true,
-  threshold: 0.6,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 2,
-  keys: ["text"]
-};
+
 
 /*
 const query = "end";
@@ -61,6 +51,47 @@ const searchTextPromise = new Promise((resolve, reject) => {
   });
 });
 */
+
+const __searchOptions = {
+  caseSensitive: true,
+  shouldSort: true,
+  findAllMatches: true,
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3, // 0.6
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 2,
+  keys: ["text"]
+}
+
+const searchInFile = (filePath, query, searchOptions) => {
+
+  console.log('searching in:', filePath)
+
+  return new Promise((resolve, reject) => {
+    let searchResult = [];
+
+    console.log('createReadStream:', filePath)
+    const stream = createReadStream(filePath, fileOptions);
+
+    stream.on("data", data => {
+      const lines = data
+        .split(/\n/)
+        .map((text, line) => ({ text, line: line + 1 }));
+
+      const fuse = new Fuse(lines, __searchOptions);
+      const results = fuse.search(query);
+      searchResult = [...searchResult, ...results];
+      console.log('searchResult:', searchResult)
+    });
+    stream.on("close", () => {
+      resolve(searchResult);
+    });
+  })
+}
+
 // searchTextPromise
 //   .then(result => {
 //     result.forEach(item => {
@@ -68,16 +99,25 @@ const searchTextPromise = new Promise((resolve, reject) => {
 //     });
 //   });
 
-; (async () => {
-  const folderItems = await readdir(projectPath)
+const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
+  const folderItems = await readdir(folderPath)
 
-  console.log(folderItems)
+  for (const item of folderItems) {
+    const itemPath = join(folderPath, item)
+    const info = await stat(itemPath)
 
-})()
-// doSomeAsyncWork(projectPath, query)
-//   .then(() => {
-//     process.send({ status: 'ready' });
-//   })
-//   .catch(e => {
-//     process.send({ status: 'error', details: e });
-//   })
+    if (info.isFile()) {
+      const result = await searchInFile(itemPath, query, searchOptions)
+      process.send({ result });
+    }
+    else if (info.isDirectory()) {
+      await search(itemPath, query, searchOptions, recursionDepth + 1)
+    }
+  }
+
+  if (recursionDepth === 0) {
+    process.send({ status: 'ready' });
+  }
+}
+
+search(projectPath, query, searchOptions)
