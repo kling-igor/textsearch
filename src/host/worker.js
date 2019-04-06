@@ -8,7 +8,7 @@ import {
 } from "fs-extra";
 
 import { createReadStream } from "fs";
-import { resolve, join, extname } from "path";
+import { resolve, join, extname, basename, dirname } from "path";
 import Fuse from "fuse.js";
 
 const fileOptions = { encoding: 'utf-8' }
@@ -66,7 +66,7 @@ const __searchOptions = {
   keys: ["text"]
 }
 
-const searchInFile = (filePath, query, searchOptions) => {
+const searchInFile = (filePath, query, searchOptions = {}) => {
   return new Promise((resolve, reject) => {
     let searchResult = [];
 
@@ -82,12 +82,12 @@ const searchInFile = (filePath, query, searchOptions) => {
       searchResult = [...searchResult, ...results];
     });
     stream.on("close", () => {
-      resolve(searchResult);
+      resolve({ file: basename(filePath), path: dirname(filePath), query, searchOptions, result: searchResult });
     });
   })
 }
 
-const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
+const search = async (folderPath, query, searchOptions = {}, recursionDepth = 0) => {
   const folderItems = await readdir(folderPath)
 
   for (const item of folderItems) {
@@ -96,7 +96,7 @@ const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
 
     if (info.isFile()) {
       const result = await searchInFile(itemPath, query, searchOptions)
-      process.send({ result });
+      process.send({ ...result });
     }
     else if (info.isDirectory()) {
       await search(itemPath, query, searchOptions, recursionDepth + 1)
@@ -104,7 +104,7 @@ const search = async (folderPath, query, searchOptions, recursionDepth = 0) => {
   }
 
   if (recursionDepth === 0) {
-    process.send({ status: 'ready' });
+    process.send({ status: 'ready', folderPath, query, searchOptions });
   }
 }
 

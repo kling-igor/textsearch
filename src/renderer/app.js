@@ -17,17 +17,25 @@ export default class App extends Component {
 
 
     ipcRenderer.on('search', (event, details) => {
-      const { status, result } = details
+
+      console.log('DETAILS:', details)
+
+      const { folderPath, status, file, path, query, searchOptions, result } = details
       if (status === 'ready') {
         console.log('SEARCH READY')
+        return
       }
 
+
       if (Array.isArray(result) && result.length > 0) {
-        for (const { item, matches } of result) {
-          console.log(`${item.line}: ${item.text}`)
-          for (const match of matches) {
-            console.log('columns:', match.indices)
-          }
+        for (const { item: { line, text }, matches: [{ indices }] } of result) {
+          this.props.store.addSearchResult({
+            text,
+            line,
+            file,
+            path,
+            matches: indices
+          })
         }
       }
     })
@@ -51,7 +59,9 @@ export default class App extends Component {
   }
 
   search = () => {
-    const { projectPath, query, searchOptions = {} } = this.props.store
+    const { projectPath, query, searchOptions = {}, clearSearchResults } = this.props.store
+
+    clearSearchResults()
 
     console.log(`searching '${query}' in ${projectPath} ...`)
     const correlationMarker = uuidv4()
