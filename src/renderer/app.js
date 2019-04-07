@@ -125,6 +125,39 @@ export default class App extends Component {
           checked={caseSensitive}
           onChange={this.handleCaseSesitiveChange}
         />
+
+        {/* <p>Search in:</p>
+        <Checkbox
+          className="bp3-align-right"
+          label="controllers"
+          checked={caseSensitive}
+          onChange={this.handleCaseSesitiveChange}
+        />
+        <Checkbox
+          className="bp3-align-right"
+          label="services"
+          checked={caseSensitive}
+          onChange={this.handleCaseSesitiveChange}
+        />
+        <Checkbox
+          className="bp3-align-right"
+          label="views"
+          checked={caseSensitive}
+          onChange={this.handleCaseSesitiveChange}
+        />
+        <Checkbox
+          className="bp3-align-right"
+          label="styles"
+          checked={caseSensitive}
+          onChange={this.handleCaseSesitiveChange}
+        />
+        <Checkbox
+          className="bp3-align-right"
+          label="models"
+          checked={caseSensitive}
+          onChange={this.handleCaseSesitiveChange}
+        /> */}
+
         {!!searchInProgress && <Progress />}
         {this.renderSearchResult()}
       </div >
