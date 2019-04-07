@@ -44,7 +44,7 @@ app.on("window-all-closed", () => {
 let worker
 let currentCorrelationMarker
 
-ipcMain.on('search', (event, correlationMarker, projectPath, query, searchOptions) => {
+ipcMain.on('search', (event, correlationMarker, projectPath, query, caseSensitive) => {
   console.log(`SEARCH ${query} in ${projectPath}`)
 
   // убиваем воркер, работающий над старой задачей
@@ -54,7 +54,7 @@ ipcMain.on('search', (event, correlationMarker, projectPath, query, searchOption
   }
 
   if (!worker) {
-    worker = fork(join(__dirname, 'worker.js'), [projectPath, query, JSON.stringify(searchOptions)]);
+    worker = fork(join(__dirname, 'worker.js'), [projectPath, query, caseSensitive]);
     currentCorrelationMarker = correlationMarker
 
     worker.on('message', details => {

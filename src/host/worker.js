@@ -15,56 +15,7 @@ const fileOptions = { encoding: 'utf-8' }
 
 const projectPath = process.argv[2]
 const query = process.argv[3]
-const searchOptions = JSON.parse(process.argv[4] || null)
-
-// setInterval(() => {
-//   process.send({ details: 'I`m alive!!!' });
-// }, 2000)
-
-
-
-// https://fusejs.io/
-
-
-// const file = resolve(__dirname, "sometext.txt");
-
-
-
-/*
-const query = "end";
-
-const searchTextPromise = new Promise((resolve, reject) => {
-  let searchResult = [];
-
-  const stream = createReadStream(file, { encoding: "utf8" });
-  stream.on("data", data => {
-    const lines = data
-      .split(/\n/)
-      .map((text, line) => ({ text, line: line + 1 }));
-
-    const fuse = new Fuse(lines, searchOptions);
-    const results = fuse.search(query);
-    searchResult = [...searchResult, ...results];
-  });
-  stream.on("close", () => {
-    resolve(searchResult);
-  });
-});
-*/
-
-const __searchOptions = {
-  caseSensitive: true,
-  shouldSort: true,
-  findAllMatches: true,
-  includeScore: true,
-  includeMatches: true,
-  threshold: 0.3, // 0.6
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 2,
-  keys: ["text"]
-}
+const caseSensitive = JSON.parse(process.argv[4] || false)
 
 const searchInFile = (filePath, query, searchOptions = {}) => {
   return new Promise((resolve, reject) => {
@@ -77,7 +28,7 @@ const searchInFile = (filePath, query, searchOptions = {}) => {
         .split(/\n/)
         .map((text, line) => ({ text, line: line + 1 }));
 
-      const fuse = new Fuse(lines, __searchOptions);
+      const fuse = new Fuse(lines, searchOptions);
       const results = fuse.search(query);
       searchResult = [...searchResult, ...results];
     });
@@ -107,6 +58,20 @@ const search = async (folderPath, query, searchOptions = {}, recursionDepth = 0)
     process.send({ status: 'ready', folderPath, query, searchOptions });
   }
 }
+
+const searchOptions = Object.assign({
+  shouldSort: true,
+  findAllMatches: true,
+  includeScore: true,
+  includeMatches: true,
+  threshold: 0.3, // 0.6
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 2,
+  keys: ["text"]
+}, { caseSensitive })
+
 
 search(projectPath, query, searchOptions).then(() => {
   process.exit(0);

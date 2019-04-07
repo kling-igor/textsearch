@@ -18,20 +18,6 @@ class Store {
     this.caseSensitive = value
   }
 
-  @observable searchOptions = {
-    caseSensitive: true,
-    shouldSort: true,
-    findAllMatches: true,
-    includeScore: true,
-    includeMatches: true,
-    threshold: 0.6,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    minMatchCharLength: 2,
-    keys: ["text"]
-  };
-
   @action.bound
   setQuery(query) {
     this.query = query
@@ -67,7 +53,7 @@ class Store {
     this.clearSearchResults()
 
     const correlationMarker = uuidv4()
-    ipcRenderer.send('search', correlationMarker, this.projectPath, this.query, this.searchOptions)
+    ipcRenderer.send('search', correlationMarker, this.projectPath, this.query, this.caseSensitive)
   }
 
   @action.bound
@@ -86,9 +72,14 @@ class Store {
 
   constructor() {
     ipcRenderer.on('search', (event, details) => {
-      const { folderPath, status, file, path, query, searchOptions, result } = details
+      const { folderPath, status, file, path, query, result } = details
       if (status === 'ready') {
         this.searchInProgress = false
+
+        if (!this.searchResult) {
+          this.searchResult = [] // to show message 'No results found.'
+        }
+
         return
       }
 
