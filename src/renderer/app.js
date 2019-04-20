@@ -13,7 +13,7 @@ import { observer, inject } from "mobx-react";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { withStyles } from '@material-ui/core/styles';
 
-import { Classes, Button, Checkbox, InputGroup, Intent, Position, Tooltip, Popover } from "@blueprintjs/core";
+import { Button, InputGroup, Intent, Position, Tooltip } from "@blueprintjs/core";
 
 
 const Progress = withStyles({
@@ -113,17 +113,9 @@ export default class App extends Component {
     const ButtonIcon = <img draggable={false} src="./assets/ui/case_sensitive.svg" width={16} height={16} />
 
     const CaseSensitiveButton = (
-      // <Popover
-      //   // content={<H1>Popover!</H1>}
-      //   position={Position.BOTTOM}
-      //   popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-      // >
       <Tooltip
-        // isOpen={true}
+        isOpen={true}
         content={<span style={{ fontSize: '10px' }}>Case Sensitive</span>}
-        // className="mypop"
-        // popoverClassName="mypop"
-        // intent={Intent.NONE}
         position={Position.BOTTOM}
         usePortal={false}
         hoverOpenDelay={1000}
@@ -131,7 +123,6 @@ export default class App extends Component {
       >
         <Button style={{ padding: '0px' }} active={caseSensitive} icon={ButtonIcon} minimal={true} small={true} intent={Intent.PRIMARY} onClick={this.toggleCaseSensitive} />
       </Tooltip>
-      // </Popover>
     )
 
     return (
