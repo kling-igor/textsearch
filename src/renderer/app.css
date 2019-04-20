@@ -1,1 +1,10 @@
 @import "~@blueprintjs/core/lib/css/blueprint.css";
+
+/* .bp3-tooltip {
+  word-wrap: none;
+} */
+
+
+.mypop {
+  padding: 0px;
+}

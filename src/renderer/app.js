@@ -13,7 +13,7 @@ import { observer, inject } from "mobx-react";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { withStyles } from '@material-ui/core/styles';
 
-import { Button, Checkbox, InputGroup, Intent } from "@blueprintjs/core";
+import { Classes, Button, Checkbox, InputGroup, Intent, Position, Tooltip, Popover } from "@blueprintjs/core";
 
 
 const Progress = withStyles({
@@ -45,6 +45,8 @@ const Progress = withStyles({
 @inject(({ store }) => ({ store }))
 @observer
 export default class App extends Component {
+
+
   constructor(props) {
     super(props);
     this.hash = window.location.hash.replace("#", "");
@@ -54,8 +56,10 @@ export default class App extends Component {
     this.props.store.setQuery(event.target.value)
   }
 
-  handleCaseSesitiveChange = event => {
-    this.props.store.setCaseSensitive(event.target.checked)
+
+  toggleCaseSensitive = () => {
+    const { store: { setCaseSensitive, caseSensitive } } = this.props
+    setCaseSensitive(!caseSensitive)
   }
 
   renderSearchResult = () => {
@@ -106,7 +110,29 @@ export default class App extends Component {
       )
     }
 
-    const SearchButton = <Button icon="search" minimal={true} small={true} intent={Intent.PRIMARY} onClick={search} /> // arrow-right
+    const ButtonIcon = <img draggable={false} src="./assets/ui/case_sensitive.svg" width={16} height={16} />
+
+    const CaseSensitiveButton = (
+      // <Popover
+      //   // content={<H1>Popover!</H1>}
+      //   position={Position.BOTTOM}
+      //   popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+      // >
+      <Tooltip
+        // isOpen={true}
+        content={<span style={{ fontSize: '10px' }}>Case Sensitive</span>}
+        // className="mypop"
+        // popoverClassName="mypop"
+        // intent={Intent.NONE}
+        position={Position.BOTTOM}
+        usePortal={false}
+        hoverOpenDelay={1000}
+        inheritDarkTheme={false}
+      >
+        <Button style={{ padding: '0px' }} active={caseSensitive} icon={ButtonIcon} minimal={true} small={true} intent={Intent.PRIMARY} onClick={this.toggleCaseSensitive} />
+      </Tooltip>
+      // </Popover>
+    )
 
     return (
       <div style={{ width: '200px' }}>
@@ -114,17 +140,23 @@ export default class App extends Component {
           // leftIcon="search"
           onChange={this.handleQueryChange}
           placeholder="Search"
-          rightElement={SearchButton}
+          rightElement={CaseSensitiveButton}
           small={true}
           value={query}
+          onKeyDown={(ev) => {
+            if (ev.key === 'Enter') {
+              ev.preventDefault();
+              search()
+            }
+          }}
         />
 
-        <Checkbox
+        {/* <Checkbox
           className="bp3-align-right"
           label="Case Sensitive"
           checked={caseSensitive}
           onChange={this.handleCaseSesitiveChange}
-        />
+        /> */}
 
         {/* <p>Search in:</p>
         <Checkbox

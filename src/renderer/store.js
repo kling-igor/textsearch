@@ -14,8 +14,8 @@ class Store {
   @observable caseSensitive = false
 
   @action.bound
-  setCaseSensitive(value) {
-    this.caseSensitive = value
+  setCaseSensitive(caseSensitive) {
+    this.caseSensitive = caseSensitive
   }
 
   @action.bound
