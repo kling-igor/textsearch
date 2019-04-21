@@ -44,26 +44,31 @@ const Progress = withStyles({
   </div>
 ))
 
-const CaseSensitiveButton = ({ caseSensitive, onClick }) => (
-  <Tooltip
-    // isOpen={true}
-    content={<span style={{ fontSize: '10px' }}>Case Sensitive</span>}
-    position={Position.BOTTOM}
-    usePortal={false}
-    hoverOpenDelay={1000}
-    inheritDarkTheme={false}
-  >
-    <Button
-      style={{ padding: '0px' }}
-      active={caseSensitive}
-      icon={<img draggable={false} src="./assets/ui/case_sensitive.svg" width={16} height={16} />}
-      minimal={true}
-      small={true}
-      intent={Intent.PRIMARY}
-      onClick={onClick}
-    />
-  </Tooltip>
-)
+const CaseSensitiveButton = ({ caseSensitive, onClick }) => {
+  const buttonStyle = { padding: '0px' }
+  const Icon = () => <img draggable={false} src="./assets/ui/case_sensitive.svg" width={16} height={16} />
+  const TooltipContent = () => <span>Case Sensitive</span>
+  return (
+    <Tooltip
+      // isOpen={true}
+      content={<TooltipContent />}
+      position={Position.BOTTOM}
+      usePortal={false}
+      hoverOpenDelay={1000}
+      inheritDarkTheme={false}
+    >
+      <Button
+        style={buttonStyle}
+        active={caseSensitive}
+        icon={<Icon />}
+        minimal={true}
+        small={true}
+        intent={Intent.PRIMARY}
+        onClick={onClick}
+      />
+    </Tooltip>
+  )
+}
 
 @observer
 export class Search extends Component {

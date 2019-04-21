@@ -24,7 +24,6 @@ html {
   }
 
   body {
-    /* @import "~@blueprintjs/core/lib/css/blueprint.css"; */
     padding: 0;
     margin: 0;
     font-family: Roboto, sans-serif;
@@ -48,6 +47,8 @@ html {
   }
 `
 
+const search = new Search()
+
 @inject(({ store }) => ({ store }))
 @observer
 export default class App extends Component {
@@ -56,9 +57,7 @@ export default class App extends Component {
       <ThemeProvider theme={light}>
         <>
           <GlobalStyle />
-          <div style={{ height: '100%', width: '300px' }}>
-            <Search store={this.props.store} />
-          </div>
+          <div style={{ height: '100%', width: '300px' }}>{search.widget}</div>
         </>
       </ThemeProvider>
     )
