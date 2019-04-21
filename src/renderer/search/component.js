@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { observer, inject } from 'mobx-react'
 
+import { basename, dirname, extname } from 'path'
+
 import LinearProgress from '@material-ui/core/LinearProgress'
 import { withStyles } from '@material-ui/core/styles'
 
@@ -70,6 +72,107 @@ const CaseSensitiveButton = ({ caseSensitive, onClick }) => {
   )
 }
 
+const ListStyle = styled.ul`
+  position: relative;
+  padding: 0;
+  margin: 0px;
+  margin-top: 0px;
+  font-size: 13px;
+  font-family: 'Open Sans', sans-serif;
+  white-space: nowrap;
+  overflow-y: auto;
+  overflow-x: auto;
+  /* text-overflow: ellipsis; */
+  width: 100%;
+  height: 100%;
+`
+
+const ListItemIconStyle = styled.img`
+  margin-right: 4px;
+`
+
+const ListItemLabelStyle = styled.span`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
+const ListItemFilenameStyle = styled.span`
+  white-space: nowrap;
+  /* overflow: hidden;
+  text-overflow: ellipsis; */
+`
+
+const ListItemFolderameStyle = styled.span`
+  white-space: nowrap;
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
+  font-size: 11px;
+  line-height: 1em;
+  opacity: 0.7;
+`
+const NodeArrowStyle = styled.span`
+  color: ${({ theme: { type } }) => (type === 'dark' ? 'white' : 'black')};
+  margin-right: 6px;
+  display: inline-block;
+  transform: ${({ ellapsed }) => (ellapsed ? 'rotate(-45deg)' : 'rotate(-90deg)')};
+  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
+
+  ::after {
+    content: '▾';
+  }
+`
+
+const ListItemInnerContainerStyle = styled.span`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: ${({ isNode }) => `${isNode ? 8 : 28}px`};
+`
+
+const ListItemContainerStyle = styled.li`
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  line-height: 1.7em;
+
+  color: ${({
+    theme: {
+      list: { focusForeground }
+    }
+  }) => focusForeground};
+
+  cursor: pointer;
+  user-select: none;
+
+  :hover {
+    background-color: ${({
+      theme: {
+        list: { hoverBackground }
+      }
+    }) => hoverBackground};
+
+    color: ${({
+      theme: {
+        list: { hoverForeground }
+      }
+    }) => hoverForeground};
+  }
+`
+
+const fileExtensions = {
+  js: 'javascript.svg',
+  json: 'json.svg'
+}
+
 @observer
 export class Search extends Component {
   handleQueryChange = event => {
@@ -83,19 +186,81 @@ export class Search extends Component {
     setCaseSensitive(!caseSensitive)
   }
 
+  renderItem = item => {
+    // { path: 'views/login-2feeddeadbeef.json', line: 2, matches: 1, ellapsed: true },
+    // { text: '  "type": "view",', line: 2, indices: [3, 6], path: 'views/login-2feeddeadbeef.json' },
+    // { path: 'views/login-2feeddeadbeef.json', line: 5, matches: 1, ellapsed: true },
+    // { text: '  "styles": [', line: 5, indices: [4, 5], path: 'views/login-2feeddeadbeef.json' }
+    const { path, line, matches, ellapsed, text, indices } = item
+
+    if (ellapsed != null) {
+      const directory = dirname(path)
+      const fullFileName = basename(path)
+      const extension = extname(fullFileName).slice(1)
+      const decoratedFileName = hashlessFileName(fullFileName)
+
+      const icon = `./assets/material-icons/${fileExtensions[extension.toLowerCase()] || 'file.svg'}`
+
+      return (
+        <ListItemContainerStyle
+          key={`${path}:${line}`}
+          onClick={() => {
+            console.log('COLLAPSE/ELLAPSE:', `${path}:${line}`)
+          }}
+        >
+          <ListItemInnerContainerStyle isNode={true}>
+            <NodeArrowStyle ellapsed={ellapsed} theme={this.props.theme} />
+            <ListItemIconStyle height="16" width="16" src={icon} />
+            <ListItemFilenameStyle>
+              {decoratedFileName}
+              {'\u00A0'}
+            </ListItemFilenameStyle>
+            <ListItemFolderameStyle>{directory}</ListItemFolderameStyle>
+          </ListItemInnerContainerStyle>
+          <span>{matches}</span>
+        </ListItemContainerStyle>
+      )
+    }
+
+    const [first, last] = indices
+    const beforeMatch = text.slice(0, first)
+    const matched = text.slice(first, last + 1)
+    const afterMatch = text.slice(last + 1)
+
+    return (
+      <ListItemContainerStyle
+        key={`${path}:${line}:${first}`}
+        onClick={() => {
+          console.log('GO TO LINE:', `${path}:${line}:${first}`)
+        }}
+      >
+        <ListItemInnerContainerStyle isNode={false}>
+          <ListItemLabelStyle>
+            <span>{beforeMatch}</span>
+            <span style={{ backgroundColor: '#ecbca0' }}>{matched}</span>
+            <span>{afterMatch}</span>
+          </ListItemLabelStyle>
+        </ListItemInnerContainerStyle>
+        {/* <span>11</span> */}
+      </ListItemContainerStyle>
+    )
+  }
+
   renderSearchResult = () => {
     const {
-      store: { searchResult }
+      store: { drawableData }
     } = this.props
 
-    if (!searchResult) {
+    if (!drawableData) {
       return null
     }
 
-    if (searchResult.length === 0) {
+    if (drawableData.length === 0) {
       return <p>No results found.</p>
     }
 
+    return <ListStyle>{drawableData.map(this.renderItem)}</ListStyle>
+    /*
     return (
       <ul>
         {searchResult.map(({ text, line, file, path, matches }, i) => {
@@ -135,6 +300,7 @@ export class Search extends Component {
         })}
       </ul>
     )
+ */
   }
 
   render() {

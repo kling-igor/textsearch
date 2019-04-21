@@ -77,15 +77,15 @@ export default {
     inactiveModifiedBorder: '#f1f1f1' //Border on the top of modified (dirty) inactive tabs in an active group.
   },
   list: {
-    activeSelectionBackground: '#75715E', // List/Tree background color for the selected item when the list/tree is active.
-    activeSelectionForeground: '#', // List/Tree foreground color for the selected item when the list/tree is active.
-    focusBackground: '#414339', // List/Tree background color for the focused item when the list/tree is active.
-    focusForeground: '#', // List/Tree foreground color for the focused item when the list/tree is active. An active list/tree has keyboard focus, an inactive does not.
-    hoverBackground: '#3e3d32', // List/Tree background when hovering over items using the mouse.
-    hoverForeground: '#', // List/Tree foreground when hovering over items using the mouse.
-    inactiveSelectionBackground: '#414339', // List/Tree background color for the selected item when the list/tree is inactive.
-    inactiveSelectionForeground: '#', // List/Tree foreground color for the selected item when the list/tree is inactive. An active list/tree has keyboard focus, an inactive does not.
-    inactiveFocusBackground: '#', // List background color for the focused item when the list is inactive. An active list has keyboard focus, an inactive does not. Currently only supported in lists.
+    activeSelectionBackground: '#e0e2ef', // List/Tree background color for the selected item when the list/tree is active.
+    activeSelectionForeground: '#5b5b5b', // List/Tree foreground color for the selected item when the list/tree is active.
+    focusBackground: '#f1f1f1', // List/Tree background color for the focused item when the list/tree is active.
+    focusForeground: '#5b5b5b', // List/Tree foreground color for the focused item when the list/tree is active. An active list/tree has keyboard focus, an inactive does not.
+    hoverBackground: '#e5e5e5', // List/Tree background when hovering over items using the mouse.
+    hoverForeground: '#5b5b5b', // List/Tree foreground when hovering over items using the mouse.
+    inactiveSelectionBackground: '#e5e5e5', // List/Tree background color for the selected item when the list/tree is inactive.
+    inactiveSelectionForeground: '#5b5b5b', // List/Tree foreground color for the selected item when the list/tree is inactive. An active list/tree has keyboard focus, an inactive does not.
+    inactiveFocusBackground: '#bababa', // List background color for the focused item when the list is inactive. An active list has keyboard focus, an inactive does not. Currently only supported in lists.
     invalidItemForeground: '#B89500', // List/Tree foreground color for invalid items, for example an unresolved root in explorer.
     errorForeground: '#A1260D', //  Foreground color of list items containing errors.
     warningForeground: '#117711' //  Foreground color of list items containing warnings.
