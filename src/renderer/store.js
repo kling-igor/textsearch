@@ -1,13 +1,12 @@
 const { ipcRenderer, remote } = window.require('electron')
 const { callMain, answerMain } = require('./ipc').default(ipcRenderer)
 import uuidv4 from 'uuid/v4'
-import { observable, action, computed, transaction, toJS, set } from "mobx";
+import { observable, action, computed, transaction, toJS, set } from 'mobx'
 
 class Store {
-
   @observable searchInProgress = false
 
-  @observable projectPath = null;
+  @observable projectPath = null
 
   @observable query = ''
 
@@ -24,25 +23,6 @@ class Store {
   }
 
   @observable.ref searchResult = null
-  // {
-  //   text: '  hello hello',
-  //   line: 3,
-  //   file: 'hello.js',
-  //   path: 'controllers',
-  //   matches: [
-  //     [3, 5],
-  //     [9, 11]
-  //   ]
-  // },
-  // {
-  //   text: 'id:"hello"',
-  //   line: 5,
-  //   file: 'hello.json',
-  //   path: 'views',
-  //   matches: [
-  //     [5, 7]
-  //   ]
-  // },
 
   @action.bound
   search = () => {
@@ -84,7 +64,10 @@ class Store {
       }
 
       if (Array.isArray(result) && result.length > 0) {
-        for (const { item: { line, text }, matches: [{ indices }] } of result) {
+        for (const {
+          item: { line, text },
+          matches: [{ indices }]
+        } of result) {
           this.addSearchResult({
             text,
             line,
@@ -98,17 +81,19 @@ class Store {
   }
 
   openFile = () => {
-    remote.dialog.showOpenDialog({
-      properties: ['openDirectory'],
-      title: 'Open Folder',
-      defaultPath: '/Users/kling/Altarix/MARM'
-    }, result => {
-      if (Array.isArray(result)) {
-        this.projectPath = result[0]
+    remote.dialog.showOpenDialog(
+      {
+        properties: ['openDirectory'],
+        title: 'Open Folder',
+        defaultPath: '/Users/kling/Altarix/MARM'
+      },
+      result => {
+        if (Array.isArray(result)) {
+          this.projectPath = result[0]
+        }
       }
-    });
+    )
   }
-
 }
 
-export default new Store();
+export default new Store()

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build:main": "babel -w src/host -d app --copy-files",
-    "renderer": "webpack-dev-server --mode development --env.dev --hot",
+    "renderer": "webpack-dev-server --mode development --env.dev",
     "build:renderer": "webpack --mode development --env.dev --watch"
   },
   "keywords": [],
