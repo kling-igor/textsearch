@@ -32,6 +32,7 @@ class Store {
 
     this.clearSearchResults()
 
+    // переместить на сторону vision.project (там известен projectPath и applicationDelegate который в main передаст задачу)
     const correlationMarker = uuidv4()
     ipcRenderer.send('search', correlationMarker, this.projectPath, this.query, this.caseSensitive)
   }
@@ -51,6 +52,7 @@ class Store {
   }
 
   constructor() {
+    //перенести в ApplicationDelegate как это сделано для onApplicationMenuCommand
     ipcRenderer.on('search', (event, details) => {
       const { folderPath, status, file, path, query, result } = details
       if (status === 'ready') {

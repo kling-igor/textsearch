@@ -1,4 +1,4 @@
-import { observable, action, computed, transaction, toJS, set } from 'mobx'
+import { observable, action, computed } from 'mobx'
 
 export class SearchResultModel {
   @observable searchInProgress = false
