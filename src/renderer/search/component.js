@@ -201,11 +201,13 @@ export class Search extends Component {
 
       const icon = `./assets/material-icons/${fileExtensions[extension.toLowerCase()] || 'file.svg'}`
 
+      const uniqPath = `${path}:${line}`
+
       return (
         <ListItemContainerStyle
-          key={`${path}:${line}`}
+          key={uniqPath}
           onClick={() => {
-            console.log('COLLAPSE/ELLAPSE:', `${path}:${line}`)
+            this.props.store.handleNodeClick(uniqPath)
           }}
         >
           <ListItemInnerContainerStyle isNode={true}>
@@ -227,11 +229,12 @@ export class Search extends Component {
     const matched = text.slice(first, last + 1)
     const afterMatch = text.slice(last + 1)
 
+    const uniqPath = `${path}:${line}:${first}`
     return (
       <ListItemContainerStyle
-        key={`${path}:${line}:${first}`}
+        key={uniqPath}
         onClick={() => {
-          console.log('GO TO LINE:', `${path}:${line}:${first}`)
+          this.props.store.handleLeafClick(uniqPath)
         }}
       >
         <ListItemInnerContainerStyle isNode={false}>

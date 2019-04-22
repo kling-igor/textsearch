@@ -1,16 +1,5 @@
 import { observable, action, computed, transaction, toJS, set } from 'mobx'
 
-const FAKE_RESULT = [
-  {
-    item: { line: 2, text: '  "type": "view",' },
-    matches: [{ arrayIndex: 0, indices: [[3, 6]] }]
-  },
-  {
-    item: { line: 5, text: '  "styles": [' },
-    matches: [{ arrayIndex: 0, indices: [[4, 5]] }]
-  }
-]
-
 export class SearchResultModel {
   @observable searchInProgress = false
 
@@ -30,39 +19,43 @@ export class SearchResultModel {
     this.query = query
   }
 
-  @observable.ref searchResult = null
+  @observable.ref searchResult = []
 
   @computed get drawableData() {
     return this.flatten()
   }
 
-  // TODO: REMOVE!!!
-  constructor() {
-    const file = 'login-2feeddeadbeef.json'
-    const path = 'views'
-
-    for (const {
-      item: { line, text },
-      matches: [{ indices }]
-    } of FAKE_RESULT) {
-      this.addSearchResult({
-        text,
-        line,
-        file,
-        path,
-        matches: indices
-      })
-    }
-  }
-
   flatten() {
-    //данные, готовые для отображения
-    return [
-      { path: 'views/login-2feeddeadbeef.json', line: 2, matches: 1, ellapsed: true },
-      { text: '  "type": "view",', line: 2, indices: [3, 6], path: 'views/login-2feeddeadbeef.json' },
-      { path: 'views/login-2feeddeadbeef.json', line: 5, matches: 1, ellapsed: true },
-      { text: '  "styles": [', line: 5, indices: [4, 5], path: 'views/login-2feeddeadbeef.json' }
-    ]
+    // //данные, готовые для отображения
+    // return [
+    //   { path: 'views/login-2feeddeadbeef.json', line: 2, matches: 1, ellapsed: true },
+    //   { text: '  "type": "view",', line: 2, indices: [3, 6], path: 'views/login-2feeddeadbeef.json' },
+    //   { path: 'views/login-2feeddeadbeef.json', line: 5, matches: 1, ellapsed: true },
+    //   { text: '  "styles": [', line: 5, indices: [4, 5], path: 'views/login-2feeddeadbeef.json' }
+    // ]
+
+    const flatten = []
+
+    let currentPath = null
+    let skipPath = null
+    for (const { path, line, matches, ellapsed, text, indices } of this.searchResult) {
+      const uniqPath = `${path}:${line}`
+
+      if (skipPath !== uniqPath) {
+        // если переход к новому node
+        if (currentPath !== uniqPath) {
+          if (ellapsed === false) {
+            skipPath = uniqPath
+          } else {
+            currentPath = uniqPath
+          }
+          flatten.push({ path, line, matches, ellapsed })
+        } else {
+          flatten.push({ path, line, text, indices })
+        }
+      }
+    }
+    return flatten
   }
 
   @action.bound
@@ -74,38 +67,58 @@ export class SearchResultModel {
     this.clearSearchResults()
 
     // fake search
-
     setTimeout(() => {
-      const file = 'login-2feeddeadbeef.json'
-      const path = 'views'
+      this.addSearchResult({
+        file: 'login-2feeddeadbeef.json',
+        path: 'views',
+        line: 2,
+        text: '  "type": "view",',
+        matches: [[3, 6]]
+      })
 
-      for (const {
-        item: { line, text },
-        matches: [{ indices }]
-      } of FAKE_RESULT) {
-        this.addSearchResult({
-          text,
-          line,
-          file,
-          path,
-          matches: indices
-        })
-      }
+      this.addSearchResult({
+        file: 'login-2feeddeadbeef.json',
+        path: 'views',
+        line: 5,
+        text: '  "styles": [',
+        matches: [[4, 5]]
+      })
 
       this.searchInProgress = false
-    }, 2000)
+    }, 0)
   }
 
   @action.bound
   addSearchResult(result) {
-    if (!this.searchResult) {
-      this.searchResult = []
-    }
-    this.searchResult = [...this.searchResult, result]
+    const { path, file, line, text, matches } = result
+    const fullPath = `${path}/${file}`
+    this.searchResult = [
+      ...this.searchResult,
+      { path: fullPath, line, matches: matches.length, ellapsed: true },
+      ...matches.map(indices => ({ path: fullPath, text, line, indices }))
+    ]
   }
 
   @action.bound
   clearSearchResults() {
-    this.searchResult = null
+    this.searchResult = []
+  }
+
+  @action
+  handleNodeClick(fullPath) {
+    // ищем путь меняем ему ellapsed
+    const found = this.searchResult.find(
+      ({ path, line, ellapsed }) => `${path}:${line}` === fullPath && ellapsed != null
+    )
+
+    if (found) {
+      found.ellapsed = !found.ellapsed
+      this.searchResult = [...this.searchResult]
+    }
+  }
+
+  @action
+  handleLeafClick(path) {
+    // вызываем событие щелчок по элементу - подписчик получает путь со строкой и столбцом
   }
 }
